@@ -1,0 +1,111 @@
+import { useEffect, useState } from "react";
+import { axios } from "../../libs/axios";
+import type { GithubIssue } from "../../../type";
+
+const LOCAL_KEY = "github_issue_v1";
+
+const ListType = () => {
+  const [data, setData] = useState<GithubIssue[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadFromCache = (key: string) => {
+    try {
+      const cached = localStorage.getItem(LOCAL_KEY);
+      if (!cached) return null;
+      const item = JSON.parse(cached);
+      const now = new Date();
+      if (now.getTime() > item.expiry) {
+        localStorage.removeItem(key);
+        return null;
+      }
+      return item.value;
+    } catch {
+      return null;
+    }
+  };
+
+  const saveToLocalStorage = (key: string, value: string) => {
+    const now = new Date();
+    const item = {
+      value: value,
+      expiry: now.getTime() + 1000 * 60 * 60,
+    };
+    localStorage.setItem(key, JSON.stringify(item));
+  };
+
+  const fetchData = async () => {
+    setLoading(true);
+
+    const cached = loadFromCache(LOCAL_KEY);
+    if (cached && cached.length > 0) {
+      setData(cached);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await axios.get("/issues");
+      setData(res.data);
+      saveToLocalStorage(LOCAL_KEY, res.data);
+    } catch (e: any) {
+      console.error("Fetch error:", e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
+
+  return (
+    <section className="h-[500px] border border-white/20 rounded-xl shadow-lg bg-white/5 backdrop-blur-md p-8 max-w-2xl mx-auto flex flex-col">
+      <div className="flex items-center justify-center mb-6">
+        <span className="inline-block rounded-full bg-gradient-to-r from-[#ff80b5] via-[#9089fc] to-[#6ee7b7] w-20 h-20 shadow-lg border-4 border-white/20" />
+      </div>
+      <div className="flex-1 overflow-auto rounded-lg bg-white/5">
+        <table className="min-w-full">
+          <thead>
+            <tr className="text-left text-gray-300 uppercase text-xs tracking-wider">
+              <th className="px-4 py-3">Github Repo Name</th>
+              <th className="px-4 py-3">Github Repo Owner</th>
+              <th className="px-4 py-3">Github Repo Created At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data && data.length > 0 ? (
+              data.map((repo: GithubIssue) => (
+                <tr
+                  key={repo.id}
+                  className="border-t border-white/10 hover:bg-white/10 transition"
+                >
+                  <td className="px-4 py-3 font-semibold text-white">
+                    {repo.title}
+                  </td>
+                  <td className="px-4 py-3 text-[#98a8f8]">
+                    {repo.user?.login}
+                  </td>
+                  <td className="px-4 py-3 text-gray-400">
+                    {new Date(repo.created_at).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={3} className="text-center text-gray-400 py-6">
+                  No issues found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+};
+
+export default ListType;
