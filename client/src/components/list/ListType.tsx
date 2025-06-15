@@ -4,8 +4,14 @@ import type { GithubIssue } from "../../../type";
 
 const LOCAL_KEY = "github_issue_v1";
 
+type GithubIssueGroup = {
+  "enhancement": GithubIssue[];
+  "good first issue": GithubIssue[];
+  "help wanted": GithubIssue[];
+};
+
 const ListType = () => {
-  const [data, setData] = useState<GithubIssue[]>([]);
+  const [data, setData] = useState<GithubIssueGroup | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadFromCache = (key: string) => {
@@ -61,7 +67,24 @@ const ListType = () => {
   if (loading) {
     return <h1>Loading...</h1>;
   }
+  const renderRows = (issues: GithubIssue[]) =>
+    issues.map((repo) => (
+      <tr key={repo.id} className="border-t border-white/10 hover:bg-white/10 transition">
+        <td className="px-4 py-3 font-semibold text-white underline"><a href={repo.url} target="_blank">{repo.title}</a></td>
+        <td className="px-4 py-3 text-[#98a8f8]">{repo.user?.login}</td>
+        <td className="px-4 py-3 text-gray-400">
+          {new Date(repo.created_at).toLocaleDateString()}
+        </td>
+      </tr>
+    ));
 
+  const hasAnyIssue =
+    data &&
+    (data.enhancement.length > 0 ||
+      data["good first issue"].length > 0 ||
+      data["help wanted"].length > 0);
+
+      
   return (
     <section className="h-[500px] border border-white/20 rounded-xl shadow-lg bg-white/5 backdrop-blur-md p-8 max-w-2xl mx-auto flex flex-col">
       <div className="flex items-center justify-center mb-6">
@@ -76,24 +99,13 @@ const ListType = () => {
               <th className="px-4 py-3">Github Repo Created At</th>
             </tr>
           </thead>
-          <tbody>
-            {data && data.length > 0 ? (
-              data.map((repo: GithubIssue) => (
-                <tr
-                  key={repo.id}
-                  className="border-t border-white/10 hover:bg-white/10 transition"
-                >
-                  <td className="px-4 py-3 font-semibold text-white">
-                    {repo.title}
-                  </td>
-                  <td className="px-4 py-3 text-[#98a8f8]">
-                    {repo.user?.login}
-                  </td>
-                  <td className="px-4 py-3 text-gray-400">
-                    {new Date(repo.created_at).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))
+            <tbody>
+            {hasAnyIssue ? (
+              <>
+                {renderRows(data!.enhancement)}
+                {renderRows(data!["good first issue"])}
+                {renderRows(data!["help wanted"])}
+              </>
             ) : (
               <tr>
                 <td colSpan={3} className="text-center text-gray-400 py-6">
