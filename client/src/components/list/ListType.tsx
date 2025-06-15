@@ -14,21 +14,22 @@ const ListType = () => {
   const [data, setData] = useState<GithubIssueGroup | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadFromCache = (key: string) => {
-    try {
-      const cached = localStorage.getItem(LOCAL_KEY);
-      if (!cached) return null;
-      const item = JSON.parse(cached);
-      const now = new Date();
-      if (now.getTime() > item.expiry) {
-        localStorage.removeItem(key);
-        return null;
-      }
-      return item.value;
-    } catch {
+const loadFromCache = (key: string) => {
+  try {
+    const cached = localStorage.getItem(LOCAL_KEY);
+    if (!cached) return null;
+    const item = JSON.parse(cached);
+    const now = new Date();
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key);
       return null;
     }
-  };
+    return JSON.parse(item.value); 
+  } catch {
+    return null;
+  }
+};
+
 
   const saveToLocalStorage = (key: string, value: string) => {
     const now = new Date();
@@ -52,7 +53,7 @@ const ListType = () => {
     try {
       const res = await axios.get("/issues");
       setData(res.data);
-      saveToLocalStorage(LOCAL_KEY, res.data);
+      saveToLocalStorage(LOCAL_KEY, JSON.stringify(res.data));
     } catch (e: any) {
       console.error("Fetch error:", e.message);
     } finally {
