@@ -40,34 +40,30 @@ Built with **React** on the frontend and **Node.js + Express** on the backend.
 ```bash
 git clone https://github.com/yourusername/devissuefinder.git
 cd devissuefinder
-
+```
 2. Install dependencies
 Backend:cd server npm install
 Frontend:cd client npm install
 
 3. Set up environment variables
 Create a .env file in the /server directory:
+```bash
 GITHUB_TOKEN=your_github_personal_access_token
 PORT=5000
-
+GITHUB_TOKEN = ""
+ISSUE_QUERY_GOOD_FIRST = ""
+ISSUE_QUERY_ENHANCEMENT = ""
+ISSUE_QUERY_HELP_WANTED = ""
+FRONTEND_URL= http://localhost:5173
+PORT= 5000
+```
 You need a GitHub token to avoid rate limits when using the GitHub API.
-
+```bash
 4. Run the application
-Backend:
-npm run dev
-Frontend:
+Backend: cd ./server npm run dev
+frontend: cd ./client npm run dev
+```
 
-cd ../client
-npm start
-📁 Folder Structure
-devissuefinder/
-├── client/           # React frontend
-│   ├── src/
-│   └── public/
-├── server/           # Express backend
-│   ├── routes/
-│   └── controllers/
-├── README.md
 
 🤝 Contributing
 Pull requests are welcome! If you find a bug or have a feature request, feel free to open an issue.
