@@ -16,14 +16,16 @@ const ListType = () => {
 
   const loadFromCache = (key: string) => {
     try {
-      const cached = localStorage.getItem(LOCAL_KEY);
+      const cached = localStorage.getItem(key);
       if (!cached) return null;
+
       const item = JSON.parse(cached);
       const now = new Date();
       if (now.getTime() > item.expiry) {
         localStorage.removeItem(key);
         return null;
       }
+
       return JSON.parse(item.value);
     } catch {
       return null;
@@ -33,34 +35,37 @@ const ListType = () => {
   const saveToLocalStorage = (key: string, value: string) => {
     const now = new Date();
     const item = {
-      value: value,
-      expiry: now.getTime() + 1000 * 60 * 60,
+      value,
+      expiry: now.getTime() + 1000 * 60 * 60, // 1 saatlik geçerlilik
     };
     localStorage.setItem(key, JSON.stringify(item));
   };
 
-  const fetchData = async () => {
-    setLoading(true);
-
-    const cached = loadFromCache(LOCAL_KEY);
-    if (cached && cached.length > 0) {
-      setData(cached);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const res = await axios.get("/issues");
-      setData(res.data);
-      saveToLocalStorage(LOCAL_KEY, JSON.stringify(res.data));
-    } catch (e: any) {
-      console.error("Fetch error:", e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    // Önce cache'den veriyi al ve göster
+    const cachedData = loadFromCache(LOCAL_KEY);
+    if (cachedData) {
+      setData(cachedData);
+      setLoading(false); // hızlı gösterim
+    }
+
+    // Sonra API'den güncel veriyi al ve varsa güncelle
+    const fetchData = async () => {
+      try {
+        const res = await axios.get("/issues");
+
+        const isSame = JSON.stringify(res.data) === JSON.stringify(cachedData);
+        if (!isSame) {
+          setData(res.data);
+          saveToLocalStorage(LOCAL_KEY, JSON.stringify(res.data));
+        }
+      } catch (e: any) {
+        console.error("Fetch error:", e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData();
   }, []);
 
@@ -91,7 +96,7 @@ const ListType = () => {
         data["good first issue"].length > 0) ||
       (Array.isArray(data["help wanted"]) && data["help wanted"].length > 0));
 
-  if (loading) {
+  if (loading && !data) {
     return <h1>Loading...</h1>;
   }
 
