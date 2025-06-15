@@ -42,14 +42,12 @@ const ListType = () => {
   };
 
   useEffect(() => {
-    // Önce cache'den veriyi al ve göster
     const cachedData = loadFromCache(LOCAL_KEY);
     if (cachedData) {
       setData(cachedData);
-      setLoading(false); // hızlı gösterim
+      setLoading(false); 
     }
 
-    // Sonra API'den güncel veriyi al ve varsa güncelle
     const fetchData = async () => {
       try {
         const res = await axios.get("/issues");
