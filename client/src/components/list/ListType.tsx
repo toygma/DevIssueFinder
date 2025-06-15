@@ -61,7 +61,8 @@ const ListType = () => {
   return (
     <section className="h-[500px] border border-white/20 rounded-xl shadow-lg bg-white/5 backdrop-blur-md p-8 max-w-2xl mx-auto flex flex-col">
       <div className="flex items-center justify-center mb-6">
-        <img src="../../../public/toygma-min.png" alt="logo" title="logo" className="rounded-full h-24 w-24"/>
+<img src="/toygma-min.png" alt="logo" title="logo" className="rounded-full h-24 w-24" />
+
       </div>
       <div className="flex-1 overflow-auto rounded-lg bg-white/5">
         <table className="min-w-full">

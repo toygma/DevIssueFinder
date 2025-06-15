@@ -4,12 +4,7 @@ const Footer = () => {
       <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-6">
         {/* Logo & Name */}
         <div className="flex items-center gap-3">
-          <img
-            src="../../../public/toygma-min.png"
-            alt="logo"
-            title="logo"
-            className="rounded-full h-12 w-12"
-          />
+         <img src="/toygma-min.png" alt="logo" title="logo" className="rounded-full h-12 w-12" />
 
           <span className="font-bold text-xl text-white tracking-tight">
             Dev Issue Finder
