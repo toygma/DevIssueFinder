@@ -61,12 +61,12 @@ const ListType = () => {
   return (
     <section className="h-[500px] border border-white/20 rounded-xl shadow-lg bg-white/5 backdrop-blur-md p-8 max-w-2xl mx-auto flex flex-col">
       <div className="flex items-center justify-center mb-6">
-        <span className="inline-block rounded-full bg-gradient-to-r from-[#ff80b5] via-[#9089fc] to-[#6ee7b7] w-20 h-20 shadow-lg border-4 border-white/20" />
+        <img src="../../../public/toygma-min.png" alt="logo" title="logo" className="rounded-full h-24 w-24"/>
       </div>
       <div className="flex-1 overflow-auto rounded-lg bg-white/5">
         <table className="min-w-full">
           <thead>
-            <tr className="text-left text-gray-300 uppercase text-xs tracking-wider">
+            <tr className="text-left text-gray-300 uppercase sm:text-xs text-[8px] tracking-wider">
               <th className="px-4 py-3">Github Repo Name</th>
               <th className="px-4 py-3">Github Repo Owner</th>
               <th className="px-4 py-3">Github Repo Created At</th>
