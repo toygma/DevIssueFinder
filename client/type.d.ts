@@ -26,5 +26,5 @@ export type GithubIssue = {
   repository_url: string;
   state: "open" | "closed";
   title: string;
-  url: string;
+  html_url: string;
 };
