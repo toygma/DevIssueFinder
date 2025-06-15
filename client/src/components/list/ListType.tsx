@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { axios } from "../../libs/axios";
 import type { GithubIssue } from "../../../type";
 
-const LOCAL_KEY = "github_issue_v1";
-
 type GithubIssueGroup = {
   enhancement: GithubIssue[];
   "good first issue": GithubIssue[];
@@ -14,49 +12,11 @@ const ListType = () => {
   const [data, setData] = useState<GithubIssueGroup | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadFromCache = (key: string) => {
-    try {
-      const cached = localStorage.getItem(key);
-      if (!cached) return null;
-
-      const item = JSON.parse(cached);
-      const now = new Date();
-      if (now.getTime() > item.expiry) {
-        localStorage.removeItem(key);
-        return null;
-      }
-
-      return JSON.parse(item.value);
-    } catch {
-      return null;
-    }
-  };
-
-  const saveToLocalStorage = (key: string, value: string) => {
-    const now = new Date();
-    const item = {
-      value,
-      expiry: now.getTime() + 1000 * 60 * 60, // 1 saatlik geçerlilik
-    };
-    localStorage.setItem(key, JSON.stringify(item));
-  };
-
   useEffect(() => {
-    const cachedData = loadFromCache(LOCAL_KEY);
-    if (cachedData) {
-      setData(cachedData);
-      setLoading(false); 
-    }
-
     const fetchData = async () => {
       try {
         const res = await axios.get("/issues");
-
-        const isSame = JSON.stringify(res.data) === JSON.stringify(cachedData);
-        if (!isSame) {
-          setData(res.data);
-          saveToLocalStorage(LOCAL_KEY, JSON.stringify(res.data));
-        }
+        setData(res.data);
       } catch (e: any) {
         console.error("Fetch error:", e.message);
       } finally {
